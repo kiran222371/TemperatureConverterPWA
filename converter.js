@@ -1,41 +1,42 @@
-// converter.js
+const inputField = document.getElementById('input-temp');
+const fromUnitField = document.getElementById('input-unit');
+const toUnitField = document.getElementById('output-unit');
+const outputField = document.getElementById('output-temp');
+const form = document.getElementById('converter');
 
-document.addEventListener("DOMContentLoaded", () => {
-  const inputTemp = document.getElementById("input-temp");
-  const inputUnit = document.getElementById("input-unit");
-  const outputUnit = document.getElementById("output-unit");
-  const outputTemp = document.getElementById("output-temp");
-
-  function convertTemperature() {
-    const value = parseFloat(inputTemp.value);
-    const from = inputUnit.value;
-    const to = outputUnit.value;
-    let celsius;
-
-    if (isNaN(value)) {
-      outputTemp.textContent = "Invalid input";
-      return;
+function convertTemp(value, fromUnit, toUnit) {
+  if (fromUnit === 'c') {
+    if (toUnit === 'f') {
+      return value * 9 / 5 + 32;
+    } else if (toUnit === 'k') {
+      return value + 273.15;
     }
-
-    // Step 1: convert from the source unit to Celsius
-    if (from === "c") celsius = value;
-    else if (from === "f") celsius = (value - 32) * 5 / 9;
-    else if (from === "k") celsius = value - 273.15;
-
-    // Step 2: convert Celsius to the desired unit
-    let result;
-    if (to === "c") result = celsius;
-    else if (to === "f") result = (celsius * 9 / 5) + 32;
-    else if (to === "k") result = celsius + 273.15;
-
-    outputTemp.textContent = result.toFixed(2) + " " + to.toUpperCase();
+    return value;
   }
+  if (fromUnit === 'f') {
+    if (toUnit === 'c') {
+      return (value - 32) * 5 / 9;
+    } else if (toUnit === 'k') {
+      return (value + 459.67) * 5 / 9;
+    }
+    return value;
+  }
+  if (fromUnit === 'k') {
+    if (toUnit === 'c') {
+      return value - 273.15;
+    } else if (toUnit === 'f') {
+      return value * 9 / 5 - 459.67;
+    }
+    return value;
+  }
+  throw new Error('Invalid unit');
+}
 
-  // Add event listeners
-  inputTemp.addEventListener("input", convertTemperature);
-  inputUnit.addEventListener("change", convertTemperature);
-  outputUnit.addEventListener("change", convertTemperature);
+form.addEventListener('input', () => {
+  const inputTemp = parseFloat(inputField.value);
+  const fromUnit = fromUnitField.value;
+  const toUnit = toUnitField.value;
 
-  // Run once at start
-  convertTemperature();
+  const outputTemp = convertTemp(inputTemp, fromUnit, toUnit);
+  outputField.value = (Math.round(outputTemp * 100) / 100) + ' ' + toUnit.toUpperCase();
 });
